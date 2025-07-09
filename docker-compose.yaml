@@ -1,24 +1,23 @@
+version: "3.8"
+
 services:
-  nlweb:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: nlweb
+  qdrant:
+    image: qdrant/qdrant
+    container_name: qdrant
     ports:
-      - "8000:8000"
-    env_file:
-      - ./code/.env
-    environment:
-      - PYTHONPATH=/app
-      - PORT=8000
+      - "6333:6333"
     volumes:
-      - ./data:/data
-      - ./code/config:/app/config:ro
-    healthcheck:
-      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000')\""]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 10s
+      - ./qdrant_storage:/qdrant/storage
     restart: unless-stopped
-    user: nlweb
+
+  qdrant-dashboard:
+    image: zjzabel/qdrant-dashboard
+    container_name: qdrant-dashboard
+    ports:
+      - "3001:80"
+    environment:
+      - QDRANT_HOST=qdrant
+      - QDRANT_PORT=6333
+    depends_on:
+      - qdrant
+    restart: unless-stopped

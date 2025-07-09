@@ -84,6 +84,10 @@ class GenerateAnswer(NLWebHandler):
         logger.info("Preparation phase completed")
    
     async def rankItem(self, url, json_str, name, site):
+            
+        print("🔍 Entrando a generate_answer.rankItem")
+        await asyncio.sleep(0) 
+
         if not self.connection_alive_event.is_set():
             logger.warning("Connection lost, skipping item ranking")
             return
@@ -93,6 +97,7 @@ class GenerateAnswer(NLWebHandler):
             prompt_str, ans_struc = find_prompt(site, self.item_type, self.RANKING_PROMPT_NAME)
             description = trim_json_hard(json_str)
             prompt = fill_prompt(prompt_str, self, {"item.description": description})
+            print(f"Ranking Prompt: {prompt}")
             logger.debug(f"Sending ranking request to LLM for item: {name}")
             ranking = await ask_llm(prompt, ans_struc, level="low", query_params=self.query_params)
             logger.debug(f"Received ranking score: {ranking.get('score', 'N/A')} for item: {name}")
@@ -129,7 +134,8 @@ class GenerateAnswer(NLWebHandler):
             # Rank each item
             tasks = []
             for url, json_str, name, site in top_embeddings:
-                tasks.append(asyncio.create_task(self.rankItem(url, json_str, name, site)))
+                selfRankItem = self.rankItem(url, json_str, name, site)
+                tasks.append(asyncio.create_task(selfRankItem))
             
             
             logger.debug(f"Running {len(tasks)} ranking tasks concurrently")
@@ -146,8 +152,18 @@ class GenerateAnswer(NLWebHandler):
     async def getDescription(self, url, json_str, query, answer, name, site):
         try:
             logger.debug(f"Getting description for item: {name}")
-            description = await PromptRunner(self).run_prompt(self.DESCRIPTION_PROMPT_NAME)
+            #description = await PromptRunner(self).run_prompt(self.DESCRIPTION_PROMPT_NAME)
+
+            prompt_str, ans_struc = find_prompt(site, self.item_type, self.DESCRIPTION_PROMPT_NAME)
+            description = trim_json_hard(json_str)
+            prompt = fill_prompt(prompt_str, self, {"item.description": description})
+            print(f"Ranking Prompt: {prompt}")
+            logger.debug(f"Sending ranking request to LLM for item: {name}")
+            description = await ask_llm(prompt, ans_struc, level="low", query_params=self.query_params)
+
             logger.debug(f"Got description for item: {name}")
+            logger.debug(f"Description for item: {description}")
+
             return (url, name, site, description["description"], json_str)
         except Exception as e:
             logger.error(f"Error getting description for {name}: {str(e)}")

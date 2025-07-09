@@ -350,9 +350,9 @@ class ModernChatInterface {
     // Build URL with parameters - using 'query' instead of 'question'
     const params = new URLSearchParams({
       query: query,  // Changed from 'question' to 'query'
-      generate_mode: 'list',
+      generate_mode: 'generate',
       display_mode: 'full',
-      site: this.selectedSite || 'all'
+      site: 'TCBA'
     });
     
     // Add previous queries (not including current query)
@@ -415,6 +415,13 @@ class ModernChatInterface {
           allResults = allResults.concat(data.results);
           console.log('Results with scores:', data.results.map(r => ({ title: r.title || r.name, score: r.score }))); // Debug log
           textDiv.innerHTML = messageContent + this.renderItems(allResults);
+        } else if (data.message_type === 'nlws' && data.answer) {
+
+          allResults = allResults.concat(data.items);
+          const decontextMsg = `<div style="color: #666; margin-bottom: 10px;">${data.answer}</div>`;
+          textDiv.innerHTML = decontextMsg +  this.renderItems(allResults);
+
+
         } else if (data.message_type === 'intermediate_message' && data.message) {
           messageContent += data.message + '\n';
           textDiv.innerHTML = messageContent + this.renderItems(allResults);
@@ -633,7 +640,7 @@ class ModernChatInterface {
       // Style the description
       const description = itemElement.querySelector('.item-description');
       if (description) {
-        description.style.cssText = 'color: #666; font-size: 14px; line-height: 1.4; margin-bottom: 4px;';
+        description.style.cssText = 'color: #666; font-size: 12px; line-height: 1.4; margin-bottom: 4px;';
       }
       
       // Style the site link
@@ -1419,7 +1426,7 @@ class ModernChatInterface {
           <textarea 
             class="centered-chat-input" 
             id="centered-chat-input"
-            placeholder="Send a message..."
+            placeholder="Estoy para ayudarte, haceme una pregunta..."
             rows="2"
           ></textarea>
           <button class="centered-send-button" id="centered-send-button">

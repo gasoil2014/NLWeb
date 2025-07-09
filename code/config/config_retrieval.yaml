@@ -31,7 +31,6 @@ endpoints:
     db_type: azure_ai_search
     name: NLWeb_Crawl_Backup
 
-  # Milvus is still under development and not yet supported. 
   milvus:
     enabled: false
     api_endpoint_env: MILVUS_ENDPOINT
@@ -48,7 +47,14 @@ endpoints:
     index_name: nlweb_collection
     # Specify the database type
     db_type: qdrant
+    api_endpoint_env: QDRANT_URL
     
+  answer_chain:
+    provider: azure_openai
+    model: gpt-4.1
+    temperature: 0.2
+    max_tokens: 500
+
   # Option 2: Remote Qdrant server
   qdrant_url:
     enabled: false
