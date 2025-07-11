@@ -183,7 +183,7 @@ class GenerateAnswer(NLWebHandler):
                 logger.warning("No ranked answers found, sending empty response")
                 message = {
                     "message_type": "nlws", 
-                    "answer": "I couldn't find relevant information to answer your question.", 
+                    "answer": "😕 ¡Ups! No encontré información relevante para responder tu pregunta. Podés intentar reformularla o preguntar sobre otra cosa", 
                     "items": []
                 }
                 await self.send_message(message)

@@ -47,23 +47,30 @@ class ModernChatInterface {
   init() {
     // Load saved conversations
     this.loadConversations();
-    
+
     // Load remembered items
-    this.loadRememberedItems();
-    this.updateRememberedItemsList();
+    //this.loadRememberedItems();
+    //this.updateRememberedItemsList();
     
     // Restore sidebar state
-    const isCollapsed = localStorage.getItem('nlweb-sidebar-collapsed') === 'true';
-    if (isCollapsed) {
-      this.elements.sidebar.classList.add('collapsed');
-      this.elements.sidebarToggle.classList.add('sidebar-collapsed');
-    }
+    //const isCollapsed = localStorage.getItem('nlweb-sidebar-collapsed') === 'true';
+    //if (isCollapsed) {
+    //  this.elements.sidebar.classList.add('collapsed');
+    //  this.elements.sidebarToggle.classList.add('sidebar-collapsed');
+    //}
     
     // Bind events
     this.bindEvents();
     
     // Start with a blank page - don't load previous conversations
-    this.createNewChat();
+    //this.createNewChat();
+
+    const savedId = sessionStorage.getItem('tcba_conversationId');
+    if (savedId) {
+      this.loadConversation(savedId);
+    } else {
+      this.createNewChat();
+    }
   }
   
   bindEvents() {
@@ -154,15 +161,16 @@ class ModernChatInterface {
           this.pendingDebugIcon = true;
         }
       }
-      this.addMessageToUI(msg.content, msg.type, false);
+
+      this.addMessageToUI(fixLinks(msg.content), msg.type, false);
     });
     
     // Update title
     const title = conversation.title || 'Bienvenido a TCba';
-    this.elements.chatTitle.textContent = title;
+    //this.elements.chatTitle.textContent = title;
     
     // Update sidebar
-    this.updateConversationsList();
+    //this.updateConversationsList();
     
     // Hide centered input and show regular chat input
     this.hideCenteredInput();
@@ -202,17 +210,19 @@ class ModernChatInterface {
         timestamp: Date.now(),
         site: this.selectedSite || 'all'
       };
+      sessionStorage.setItem('tcba_conversationId', this.currentConversationId);
       this.conversations.unshift(conversation);
     }
     
     // Add message to conversation
+    content = fixLinks(content);
     conversation.messages.push({ content, type, timestamp: Date.now() });
     
     // Update title if first message
-    if (conversation.messages.length === 1 && type === 'user') {
-      conversation.title = content.substring(0, 30) + (content.length > 30 ? '...' : '');
-      this.elements.chatTitle.textContent = conversation.title;
-    }
+    //if (conversation.messages.length === 1 && type === 'user') {
+    //  conversation.title = content.substring(0, 30) + (content.length > 30 ? '...' : '');
+    //  this.elements.chatTitle.textContent = conversation.title;
+    //}
     
     conversation.timestamp = Date.now();
     this.saveConversations();
@@ -233,23 +243,23 @@ class ModernChatInterface {
     
     // Create message layout container
     const messageLayout = document.createElement('div');
-    messageLayout.style.cssText = 'display: flex; align-items: flex-start; gap: 8px;';
+    //messageLayout.style.cssText = 'display: flex; justify-content: flex-end !important; width: 100% !important; gap: 8px;';
     
     // Add debug icon for assistant messages if pending
-    if (type === 'assistant' && this.pendingDebugIcon) {
-      const debugIcon = document.createElement('span');
-      debugIcon.className = 'message-debug-icon';
-      debugIcon.textContent = '{}';
-      debugIcon.title = 'Show debug info';
-      debugIcon.style.marginTop = '4px';
-      debugIcon.addEventListener('click', () => this.toggleDebugInfo());
-      messageLayout.appendChild(debugIcon);
-      this.pendingDebugIcon = false;
-    }
+    //if (type === 'assistant' && this.pendingDebugIcon) {
+    //  const debugIcon = document.createElement('span');
+    //  debugIcon.className = 'message-debug-icon';
+    //  debugIcon.textContent = '{}';
+    //  debugIcon.title = 'Show debug info';
+    //  debugIcon.style.marginTop = '4px';
+    //  debugIcon.addEventListener('click', () => this.toggleDebugInfo());
+    //  messageLayout.appendChild(debugIcon);
+    //  this.pendingDebugIcon = false;
+    //}
     
-    const avatar = document.createElement('div');
-    avatar.className = 'message-avatar';
-    avatar.textContent = type === 'user' ? 'U' : 'A';
+    //const avatar = document.createElement('div');
+    //avatar.className = 'message-avatar';
+    //avatar.textContent = type === 'user' ? 'U' : 'A';
     
     const contentDiv = document.createElement('div');
     contentDiv.className = 'message-content';
@@ -274,7 +284,7 @@ class ModernChatInterface {
     contentDiv.appendChild(textDiv);
     
     // Build the message structure
-    messageLayout.appendChild(avatar);
+    //messageLayout.appendChild(avatar);
     messageLayout.appendChild(contentDiv);
     messageDiv.appendChild(messageLayout);
     
@@ -391,11 +401,12 @@ class ModernChatInterface {
           console.log('Results with scores:', data.results.map(r => ({ title: r.title || r.name, score: r.score }))); // Debug log
           textDiv.innerHTML = messageContent + this.renderItems(allResults);
         } else if (data.message_type === 'nlws' && data.answer) {
-
+          
           allResults = allResults.concat(data.items);
-          const decontextMsg = `<div style="color: #666; margin-bottom: 10px;">${data.answer}</div>`;
+          const decontextMsg = `<div style="color: #666; margin-bottom: 10px; padding: 12px 16px !important;">${data.answer}</div>`;
           textDiv.innerHTML = decontextMsg +  this.renderItems(allResults);
 
+          textDiv.innerHTML = fixLinks(textDiv.innerHTML);
 
         } else if (data.message_type === 'intermediate_message' && data.message) {
           messageContent += data.message + '\n';
@@ -577,7 +588,7 @@ class ModernChatInterface {
     // Create a container for all results
     const resultsContainer = document.createElement('div');
     resultsContainer.className = 'search-results';
-    resultsContainer.style.cssText = 'display: flex; flex-direction: column; gap: 12px; margin-top: 16px;';
+    //resultsContainer.style.cssText = 'display: flex; flex-direction: column; gap: 12px; margin-top: 16px;';
     
     sortedItems.forEach(item => {
       // Use JsonRenderer to create the item HTML
@@ -1272,7 +1283,7 @@ class ModernChatInterface {
           <textarea 
             class="centered-chat-input" 
             id="centered-chat-input"
-            placeholder="Estoy para ayudarte, haceme una pregunta..."
+            placeholder="Haceme una pregunta..."
             rows="2"
           ></textarea>
           <button class="centered-send-button" id="centered-send-button">
@@ -1281,6 +1292,19 @@ class ModernChatInterface {
               <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
             </svg>
           </button>
+        </div>
+        <div class="assistant-hint-box">
+          <p class="intro">👋 ¡Hola! Estoy acá para ayudarte con cualquier consulta sobre nosotros.</p>
+          <p>Podés preguntarme cosas como:</p>
+          <ul class="question-list">
+            <li>📍 ¿Dónde se realiza la entrega de estudios?</li>
+            <li>🕒 ¿Cuál es el horario de atención de la sede Almagro?</li>
+            <li>📌 ¿Cuál es la dirección del Centro de la Mujer?</li>
+            <li>📞 ¿Me podrías informar las vías de contacto?</li>
+            <li>🧪 Necesito hacerme una densitometría, ¿de qué tipo realizan?</li>
+            <li>👨‍⚕️ ¿Quién es el director médico de TCba?</li>
+            <li>💳 Tengo ACA Salud, ¿puedo atenderme en TCba?</li>
+          </ul>
         </div>
       </div>
     `;
