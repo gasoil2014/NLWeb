@@ -32,13 +32,13 @@ endpoints:
       low: gemini-2.0-flash
 
   azure_openai:
-    api_key_env: 3b24b09ccd2f4225864d6051e7173873
-    api_endpoint_env: https://qv3-homes.openai.azure.com/
-    api_version_env: "2025-01-01-preview"
+    api_key_env: 1TWQvD8ptAnJANdOsLz28DnCtTzaWv1ZOUBWI1L8qJLzMHRgxuJzJQQJ99BHACYeBjFXJ3w3AAABACOGKWtg
+    api_endpoint_env: https://asistente-web-tcba.openai.azure.com/
+    api_version_env: "2024-12-01-preview"
     llm_type: azure_openai
     models:
       high: gpt-4.1
-      low: gpt-4.1
+      low: gpt-4.1-mini
 
   llama_azure:
     api_key_env: LLAMA_AZURE_API_KEY

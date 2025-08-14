@@ -1,4 +1,7 @@
-write_endpoint: qdrant_local
+#write_endpoint: qdrant_local
+write_endpoint: azure_ai_search
+read_endpoint: azure_ai_search
+
 
 endpoints:
 
@@ -17,11 +20,14 @@ endpoints:
     db_type: azure_ai_search
 
   azure_ai_search:
-    enabled: false
-    api_key_env: AZURE_VECTOR_SEARCH_API_KEY
-    api_endpoint_env: AZURE_VECTOR_SEARCH_ENDPOINT
-    index_name: embeddings1536
+    enabled: true
+    api_key_env: bMVXk8tnI5zyLi0Pjvn6M92tW8COp32TkE39vRbYCmAzSeBYxLNg
+    api_endpoint_env: https://asistente-web-tcba-ai-search.search.windows.net/
+    index_name: tcba_web_collection
     db_type: azure_ai_search
+    vector_dimensions: 1536                   # text-embedding-3-small
+    similarity: cosine
+    create_index_if_missing: true
 
   azure_ai_search_backup:
     enabled: false
@@ -40,11 +46,11 @@ endpoints:
 
   # Option 1: Local file-based Qdrant storage
   qdrant_local:
-    enabled: true
+    enabled: false
     # Use local file-based storage with a specific path
     database_path: "../data/db"
     # Set the collection name to use
-    index_name: nlweb_collection
+    index_name: tcba_web_collection
     # Specify the database type
     db_type: qdrant
     api_endpoint_env: QDRANT_URL
@@ -59,11 +65,11 @@ endpoints:
   qdrant_url:
     enabled: false
     # Connect to a Qdrant server at a specific URL
-    api_endpoint_env: QDRANT_URL
+    api_endpoint_env: localhost:6333/
     # Optional API key for authentication
-    api_key_env: QDRANT_API_KEY
+    api_key_env: asdf
     # Set the collection name to use
-    index_name: nlweb_collection
+    index_name: tcba_web_collection
     # Specify the database type
     db_type: qdrant
 
@@ -115,7 +121,7 @@ endpoints:
       type: dense_vector  # PostgreSQL with pgvector extension configuration
   
   postgres:
-    enabled: true
+    enabled: false
     # Database connection details (i.e. "postgresql://<HOST>:<PORT>/<DATABASE>?user=<USERNAME>&sslmode=require")
     api_endpoint_env: POSTGRES_CONNECTION_STRING
     # Password for authentication 

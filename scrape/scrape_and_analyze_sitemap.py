@@ -1,4 +1,28 @@
-# scrape/scrape_and_analyze_tcba.py
+# =============================================================================
+# RESUMEN COMENTADO — scrape/scrape_and_analyze_tcba.py
+# =============================================================================
+# Objetivo general
+# ---------------
+# - Lee un sitemap XML (scrape/sitemap.xml) para obtener URLs de tcba.com.ar.
+# - Para cada URL:
+#     1) Descarga el HTML.
+#     2) Extrae texto “limpio” y estructurado de las secciones principales.
+#     3) Descarga imágenes relevantes del cuerpo del artículo, las convierte a
+#        base64 y se las envía a un modelo de OpenAI para extraer texto visible
+#        o, si no hay texto, una breve descripción.
+#     4) Guarda por línea un JSON con {url, contenido_textual, informacion_extraida_de_imagenes}
+#        en scrape/web_content.jsonl (formato JSONL).
+#
+# Configuración clave
+# -------------------
+# - SITEMAP_PATH: ruta del sitemap a procesar.
+# - OUTPUT_FILE: destino de salida en formato JSONL.
+# - BASE_URL: dominio base (https://www.tcba.com.ar).
+# - OPENAI_API_KEY: **API Key hardcodeada** (riesgo de seguridad).
+# - HEADERS: encabezados HTTP para simular navegador.
+# - IGNORED_IMAGES: lista de nombres de imágenes a omitir (logos, badges, tiendas).
+# =============================================================================
+
 import os, time, json, base64
 import xml.etree.ElementTree as ET
 import requests
@@ -9,8 +33,8 @@ from io import BytesIO
 from openai import OpenAI
 
 # === CONFIG ===
-SITEMAP_PATH = os.path.join("scrape", "joomla.xml")
-OUTPUT_FILE = os.path.join("scrape", "tcba_web_content.jsonl")
+SITEMAP_PATH = os.path.join("scrape", "sitemapparcial.xml")
+OUTPUT_FILE = os.path.join("scrape", "web_contentparcial.jsonl")
 BASE_URL = "https://www.tcba.com.ar"
 OPENAI_API_KEY = "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"  # remplazar por tu key
 

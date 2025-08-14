@@ -11,8 +11,8 @@ providers:
     model: gemini-embedding-exp-03-07
 
   azure_openai:
-    api_key_env: 3b24b09ccd2f4225864d6051e7173873
-    api_endpoint_env: https://qv3-homes.openai.azure.com/
+    api_key_env: 1TWQvD8ptAnJANdOsLz28DnCtTzaWv1ZOUBWI1L8qJLzMHRgxuJzJQQJ99BHACYeBjFXJ3w3AAABACOGKWtg
+    api_endpoint_env: https://asistente-web-tcba.openai.azure.com/
     api_version_env: "2025-01-01-preview"  # Specific API version for embeddings
     model: text-embedding-3-small
 

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Change to the application directory
-cd /home/site/wwwroot/code
+cd /code
 echo "Python version:"
 python --version
 echo "Directory contents:"
